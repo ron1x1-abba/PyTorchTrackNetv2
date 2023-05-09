@@ -5,7 +5,7 @@ def create_conv_sub_layer(in_size, out_size):
     return torch.nn.Sequential(*[
         torch.nn.Conv2d(in_size, out_size, (3, 3), padding='same', stride=1),
         torch.nn.ReLU(),
-        torch.nn.BatchNorm2d(out_size, momentum=0.9, epsilon=1e-3)
+        torch.nn.BatchNorm2d(out_size, momentum=0.9, eps=1e-3)
     ])
 
 
@@ -24,7 +24,7 @@ def create_deconv_layer(in_size, out_size, num):
     layers.append(create_conv_sub_layer(in_size, out_size))
     for _ in range(num-1):
         layers.append(create_conv_sub_layer(out_size, out_size))
-    return torch.nn.Seqential(*layers)
+    return torch.nn.Sequential(*layers)
 
 
 class TrackNetV2(torch.nn.Module):

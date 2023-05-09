@@ -43,7 +43,7 @@ class ImgDataset(torch.utils.data.Dataset):
         tmp = self.heatmaps[idx]
         heatmaps = np.concatenate([generate_heat_map(self.width, self.height, x[0], x[1],
                                                      self.sigma, self.mag)[None, ...] for x in tmp], axis=0)
-        return self.imgs[idx], heatmaps
+        return self.imgs[idx].unsqueeze(0).float() / 255, torch.from_numpy(heatmaps).unsqueeze(0)
 
 
 def collate(inputs):
@@ -161,6 +161,7 @@ def evaluate(
 
     targets = np.concatenate(targets, axis=0)
     preds = np.concatenate(preds, axis=0)
+    preds = (preds > 0.5).astype(np.float32)
 
     if train_config['metric'] == 'loss':
         metric = np.mean(val_losses)
@@ -186,8 +187,8 @@ def compute_metric(preds, targets, metric, out, tol):
             elif np.amax(p) == 0 and np.amax(t) > 0:
                 FN += 1
             else:
-                x_p, y_p = find_pos(p[None, ...])
-                x_t, y_t = find_pos(t[None, ...])
+                x_p, y_p = find_pos((p * 255).astype(np.uint8))
+                x_t, y_t = find_pos((t * 255).astype(np.uint8))
                 dist = np.sqrt((x_p - x_t)**2 + (y_p - y_t)**2)
                 if dist >= tol:
                     TP += 1
