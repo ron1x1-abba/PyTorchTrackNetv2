@@ -1,0 +1,16 @@
+{
+  "fp16": true,
+  "epochs": 10,
+  "train_bs": 8,
+  "val_bs": 8,
+  "accumulate_grad_batches": 1,
+  "metric": "F1",
+  "minimize_metric": false,
+  "tol": 5.0,
+  "compile": true,
+  "optimizer_config": {
+    "name": "adadelta",
+    "lr": 1.0,
+    "weight_decay": 0.0
+  }
+}
