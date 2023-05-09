@@ -3,16 +3,16 @@ import torch
 
 def create_conv_sub_layer(in_size, out_size):
     return torch.nn.Sequential(*[
-        torch.nn.Conv2D(in_size, out_size, (3, 3), padding='same', stride=1),
+        torch.nn.Conv2d(in_size, out_size, (3, 3), padding='same', stride=1),
         torch.nn.ReLU(),
-        torch.nn.BatchNorm2D(out_size, momentum=0.9, epsilon=1e-3)
+        torch.nn.BatchNorm2d(out_size, momentum=0.9, epsilon=1e-3)
     ])
 
 
 def create_vgg_16_layer(in_size, out_size, num, pool):
     layers = []
     if pool:
-        layers.append(torch.nn.MaxPool2D(kernel_size=(2, 2), stride=(2, 2)))
+        layers.append(torch.nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2)))
     layers.append(create_conv_sub_layer(in_size, out_size))
     for _ in range(num-1):
         layers.append(create_conv_sub_layer(out_size, out_size))
@@ -56,7 +56,7 @@ class TrackNetV2(torch.nn.Module):
         self.deconv_1 = create_deconv_layer(in_size=256+512, out_size=256, num=3)
         self.deconv_2 = create_deconv_layer(in_size=128+256, out_size=128, num=2)
         self.deconv_3 = create_deconv_layer(in_size=64+128, out_size=64, num=2)
-        self.final_conv = torch.nn.Conv2D(64, out, (1, 1), padding='same', stride=1)
+        self.final_conv = torch.nn.Conv2d(64, out, (1, 1), padding='same', stride=1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """

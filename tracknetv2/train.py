@@ -232,12 +232,12 @@ def main(args):
                              train_config['sigma'], train_config['mag'])
     print("Finish reading train data.")
 
-    train_dataloader = torch.utils.data.Dataloader(
+    train_dataloader = torch.utils.data.DataLoader(
         train_dataset, shuffle=True, batch_size=train_config['train_bs'], num_workers=8, pin_memory=True,
         collate_fn=collate
     )
 
-    val_dataloader = torch.utils.data.Dataloader(
+    val_dataloader = torch.utils.data.DataLoader(
         val_dataset, shuffle=False, batch_size=train_config['val_bs'], num_workers=8, pin_memory=True,
         collate_fn=collate
     )

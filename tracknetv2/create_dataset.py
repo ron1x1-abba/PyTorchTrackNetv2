@@ -61,7 +61,7 @@ def create_dataset(args):
             f.write('\t'.join([','.join([str(y) for y in x]) for x in heatmap]))
 
     print("Finish processing data!")
-    print(f"Count {len(final_heatmaps) / (args.consecutive_frames if args.same_in_out else 1)} valid examples.")
+    print(f"Count {len(final_heatmaps)} valid examples.")
 
 
 if __name__ == "__main__":
