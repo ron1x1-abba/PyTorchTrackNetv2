@@ -74,7 +74,7 @@ def generate_same(
 
         for j in range(consecutive_frames):
             if tgt[cur_label + j] == 0:
-                tmp.append(generate_heat_map(width, height, -1, -1, )[None, :, :])
+                tmp.append(generate_heat_map(width, height, -1, -1, sigma, mag)[None, :, :])
             else:
                 tmp.append(generate_heat_map(width, height,
                                              int(x[cur_label + j] / w_ratio),
