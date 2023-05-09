@@ -50,6 +50,7 @@ def create_dataset(args):
     final_heatmaps = np.concatenate([x[None, ...] for x in final_heatmaps], axis=0)
 
     save_path = args.output_path
+    os.makedirs(save_path, exist_ok=True)
     with open(os.path.join(save_path, 'imgs.npy'), 'wb') as f:
         np.save(f, final_imgs)
     with open(os.path.join(save_path, 'heatmaps.npy'), 'wb') as f:
