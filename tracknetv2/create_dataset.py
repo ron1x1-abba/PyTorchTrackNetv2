@@ -1,5 +1,6 @@
 import argparse
 import glob
+import os
 from tqdm import tqdm
 import numpy as np
 from pathlib import Path
@@ -32,7 +33,7 @@ def create_dataset(args):
 
     print("Start processing data...")
     for video in tqdm(videos):
-        csv = video.replace('.mp4', '.csv')
+        csv = os.path.join(args.label_path, video.split('/')[-1].replace('.mp4', '.csv'))
         imgs, tgts = generate_data(
             video_path=video,
             label_path=csv,
