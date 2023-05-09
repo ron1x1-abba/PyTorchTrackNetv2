@@ -58,20 +58,19 @@ def generate_same(
             frames = []
             continue
 
-        frames.append(np.transpose(cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA), [2, 0, 1]))
+        frames.append(cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA))
 
         if len(frames) == 1:
             for _ in range(consecutive_frames - 1):
                 ret, frame = cap.read()
                 if not ret:
                     break
-                frames.append(np.transpose(cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA),
-                                           [2, 0, 1]))
+                frames.append(cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA))
                 cur_frame += 1
             if not ret:
                 break
 
-        imgs.append(np.concatenate(frames, axis=0))  # shape (3 * cons_frames, H, W)
+        imgs.append(frames)  # shape (3 * cons_frames, H, W)
 
         tmp = []
 

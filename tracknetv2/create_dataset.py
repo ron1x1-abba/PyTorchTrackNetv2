@@ -3,6 +3,7 @@ import glob
 import os
 from tqdm import tqdm
 import numpy as np
+import cv2
 
 from tracknetv2.dataset import generate_data
 
@@ -46,14 +47,17 @@ def create_dataset(args):
         final_imgs += imgs
         final_heatmaps += tgts
 
+    assert len(final_imgs) == len(final_heatmaps)
+
     save_path = args.output_path
     os.makedirs(save_path, exist_ok=True)
     print(f"Start saving examples to {save_path}")
-    for i, img in enumerate(final_imgs):
-        with open(os.path.join(save_path, f"img_{i}.npy"), 'wb') as f:
-            np.save(f, img)
-    for i, heatmap in enumerate(final_heatmaps):
-        with open(os.path.join(save_path, f"heatmap_{i}.npy"), 'wb') as f:
+    for i, (imgs, heatmap) in tqdm(enumerate(zip(final_imgs, final_heatmaps)), total=len(final_imgs)):
+        path = os.path.join(save_path, str(i))
+        os.makedirs(path, exist_ok=True)
+        for j, img in enumerate(imgs):
+            cv2.imwrite(os.path.join(path, f"{j}.jpg"), img)
+        with open(os.path.join(path, "heatmap.npy"), 'wb') as f:
             np.save(f, heatmap)
 
     print("Finish processing data!")

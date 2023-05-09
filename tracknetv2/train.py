@@ -1,6 +1,7 @@
 import glob
 
 import torch
+import torchvision
 import argparse
 import os
 import json
@@ -15,11 +16,18 @@ from tracknetv2.util import CustomLoss, OPTIMIZERS, find_pos
 
 
 class ImgDataset(torch.utils.data.Dataset):
-    def __init__(self, imgs, heatmaps):
+    def __init__(self, data_path):
         super().__init__()
 
-        self.imgs = [torch.from_numpy(x) for x in imgs]
-        self.heatmaps = [torch.from_numpy(x) for x in heatmaps]
+        self.imgs = []
+        self.heatmaps = []
+        for dir_path in glob.glob(data_path + '/*'):
+            tmp = []
+            for img in glob.glob(dir_path + '/*.jpg'):
+                tmp.append(torchvision.io.read_image(img))
+            self.imgs.append(torch.cat(tmp, dim=0))
+            with open(os.path.join(dir_path, "heatmap.npy"), 'rb') as f:
+                self.heatmaps.append(np.load(f))
 
     def __len__(self):
         return len(self.imgs)
@@ -199,28 +207,14 @@ def save_model(sd, epoch, step, path, metric, metric_name, model_v):
 
 def main(args):
     print("Reading train data..")
-    train_imgs = []
-    for path in glob.glob(args.train_data + "/img_*.npy"):
-        with open(path, 'rb') as f:
-            train_imgs.append(np.load(f))
-    train_heatmaps = []
-    for path in glob.glob(args.train_data + "/heatmap_*.npy"):
-        with open(path, 'rb') as f:
-            train_heatmaps.append(np.load(f))
-    train_dataset = ImgDataset(train_imgs, train_heatmaps)
+    train_dataset = ImgDataset(args.train_data)
     print("Finish reading train data.")
 
-    val_imgs = []
-    for path in glob.glob(args.val_data + "/img_*.npy"):
-        with open(path, 'rb') as f:
-            val_imgs.append(np.load(f))
-    val_heatmaps = []
-    for path in glob.glob(args.val_data + "/heatmap_*.npy"):
-        with open(path, 'rb') as f:
-            val_heatmaps.append(np.load(f))
-    val_dataset = ImgDataset(val_imgs, val_heatmaps)
+    print("Reading val data..")
+    val_dataset = ImgDataset(args.val_data)
+    print("Finish reading train data.")
 
-    with open(args.train_config):
+    with open(args.train_config) as f:
         train_config = json.load(f)
 
     train_dataloader = torch.utils.data.Dataloader(
