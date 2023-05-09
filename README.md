@@ -42,3 +42,23 @@ python create_dataset.py --video_path=<directory_with_video> --label_path=<direc
 
 Args without default values are 'store-action' args.
 
+## Train model
+
+```
+python train.py --train_data=<directory_with_train_data> --val_data=<directory_with_val_data> \
+ --save_path=<path_to_save_weights> --logdir=<path_to_save_logs>
+```
+### Available options
+| Name | Type | Default | Description                        |
+|------|------|---------|------------------------------------|
+ | train_data | str | train | Path to directory with train data. |
+ | val_data | str | val | Path to directory with val data.   |
+ | save_path | str | weights | Path to directory where to save model weights. |
+ | logdir | str | mylogs | Path to directory with training logs. |
+ | train_config | str | configs/train_config.json | Path to .json config with training info. |
+ | model_config | str | configs/model_config.json | Path to .json config with model info. |
+
+All available values for configs presented in files configs/*.json . Except for "optimizer_config".
+You can use in it any key/value pair compatible with pytorch optimizers.
+
+## Prediction

@@ -46,15 +46,15 @@ def create_dataset(args):
         final_imgs += imgs
         final_heatmaps += tgts
 
-    final_imgs = np.concatenate([x[None, ...] for x in final_imgs], axis=0)
-    final_heatmaps = np.concatenate([x[None, ...] for x in final_heatmaps], axis=0)
-
     save_path = args.output_path
     os.makedirs(save_path, exist_ok=True)
-    with open(os.path.join(save_path, 'imgs.npy'), 'wb') as f:
-        np.save(f, final_imgs)
-    with open(os.path.join(save_path, 'heatmaps.npy'), 'wb') as f:
-        np.save(f, final_heatmaps)
+    print(f"Start saving examples to {save_path}")
+    for i, img in enumerate(final_imgs):
+        with open(os.path.join(save_path, f"img_{i}.npy"), 'wb') as f:
+            np.save(f, img)
+    for i, heatmap in enumerate(final_heatmaps):
+        with open(os.path.join(save_path, f"heatmap_{i}.npy"), 'wb') as f:
+            np.save(f, heatmap)
 
     print("Finish processing data!")
     print(f"Count {len(final_heatmaps) / (args.consecutive_frames if args.same_in_out else 1)} valid examples.")

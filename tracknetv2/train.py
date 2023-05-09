@@ -1,3 +1,5 @@
+import glob
+
 import torch
 import argparse
 import os
@@ -196,16 +198,26 @@ def save_model(sd, epoch, step, path, metric, metric_name, model_v):
 
 
 def main(args):
-    with open(os.path.join(args.train_data, 'imgs.npy'), 'rb') as f:
-        train_imgs = np.load(f)
-    with open(os.path.join(args.train_data, 'heatmaps.npy'), 'rb') as f:
-        train_heatmaps = np.load(f)
+    print("Reading train data..")
+    train_imgs = []
+    for path in glob.glob(args.train_data + "/img_*.npy"):
+        with open(path, 'rb') as f:
+            train_imgs.append(np.load(f))
+    train_heatmaps = []
+    for path in glob.glob(args.train_data + "/heatmap_*.npy"):
+        with open(path, 'rb') as f:
+            train_heatmaps.append(np.load(f))
     train_dataset = ImgDataset(train_imgs, train_heatmaps)
+    print("Finish reading train data.")
 
-    with open(os.path.join(args.val_data, 'imgs.npy'), 'rb') as f:
-        val_imgs = np.load(f)
-    with open(os.path.join(args.val_data, 'heatmaps.npy'), 'rb') as f:
-        val_heatmaps = np.load(f)
+    val_imgs = []
+    for path in glob.glob(args.val_data + "/img_*.npy"):
+        with open(path, 'rb') as f:
+            val_imgs.append(np.load(f))
+    val_heatmaps = []
+    for path in glob.glob(args.val_data + "/heatmap_*.npy"):
+        with open(path, 'rb') as f:
+            val_heatmaps.append(np.load(f))
     val_dataset = ImgDataset(val_imgs, val_heatmaps)
 
     with open(args.train_config):
