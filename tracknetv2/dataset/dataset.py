@@ -50,7 +50,7 @@ def generate_same(
             frames = []
             continue
 
-        if cur_label + (consecutive_frames - 1) > len(nums):
+        if cur_label + (consecutive_frames - 1) >= len(nums):
             break
 
         if nums[cur_label] + (consecutive_frames - 1) != nums[cur_label + (consecutive_frames - 1)]:

@@ -3,7 +3,6 @@ import glob
 import os
 from tqdm import tqdm
 import numpy as np
-from pathlib import Path
 
 from tracknetv2.dataset import generate_data
 
@@ -50,10 +49,10 @@ def create_dataset(args):
     final_imgs = np.concatenate([x[None, ...] for x in final_imgs], axis=0)
     final_heatmaps = np.concatenate([x[None, ...] for x in final_heatmaps], axis=0)
 
-    save_path = Path(args.path)
-    with open(save_path.join('imgs.npy'), 'wb') as f:
+    save_path = args.output_path
+    with open(os.path.join(save_path, 'imgs.npy'), 'wb') as f:
         np.save(f, final_imgs)
-    with open(save_path.join('heatmaps.npy'), 'wb') as f:
+    with open(os.path.join(save_path, 'heatmaps.npy'), 'wb') as f:
         np.save(f, final_heatmaps)
 
     print("Finish processing data!")
