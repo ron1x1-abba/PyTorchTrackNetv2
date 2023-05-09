@@ -7,6 +7,8 @@
   "metric": "F1",
   "minimize_metric": false,
   "tol": 5.0,
+  "sigma": 2.5,
+  "mag": 2,
   "compile": true,
   "optimizer_config": {
     "name": "adadelta",

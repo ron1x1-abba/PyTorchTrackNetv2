@@ -1,3 +1,3 @@
-from .dataset import generate_data
+from .dataset import generate_data, generate_heat_map
 
-__all__ = ["generate_data"]
+__all__ = ["generate_data", "generate_heat_map"]

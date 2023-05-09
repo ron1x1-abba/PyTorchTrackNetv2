@@ -13,27 +13,37 @@ from torch.utils.tensorboard import SummaryWriter
 
 from tracknetv2.model import TrackNetV2
 from tracknetv2.util import CustomLoss, OPTIMIZERS, find_pos
+from tracknetv2.dataset import generate_heat_map
 
 
 class ImgDataset(torch.utils.data.Dataset):
-    def __init__(self, data_path):
+    def __init__(self, data_path, width, height, sigma, mag):
         super().__init__()
 
+        self.width = width
+        self.height = height
+        self.sigma = sigma
+        self.mag = mag
         self.imgs = []
         self.heatmaps = []
-        for dir_path in glob.glob(data_path + '/*'):
+        for dir_path in tqdm(glob.glob(data_path + '/*'), leave=False):
             tmp = []
             for img in glob.glob(dir_path + '/*.jpg'):
                 tmp.append(torchvision.io.read_image(img))
             self.imgs.append(torch.cat(tmp, dim=0))
-            with open(os.path.join(dir_path, "heatmap.npy"), 'rb') as f:
-                self.heatmaps.append(np.load(f))
+            with open(os.path.join(dir_path, "heatmap.txt")) as f:
+                heatmap = f.read().strip().split('\t')
+            heatmap = [tuple(int(y.strip()) for y in x.split(',')) for x in heatmap]
+            self.heatmaps.append(heatmap)
 
     def __len__(self):
         return len(self.imgs)
 
     def __getitem__(self, idx):
-        return self.imgs[idx]. self.heatmaps[idx]
+        tmp = self.heatmaps[idx]
+        heatmaps = np.concatenate([generate_heat_map(self.width, self.height, x[0], x[1],
+                                                     self.sigma, self.mag)[None, ...] for x in tmp], axis=0)
+        return self.imgs[idx], heatmaps
 
 
 def collate(inputs):
@@ -206,16 +216,21 @@ def save_model(sd, epoch, step, path, metric, metric_name, model_v):
 
 
 def main(args):
+    with open(args.train_config) as f:
+        train_config = json.load(f)
+
+    with open(args.model_config) as f:
+        model_config = json.load(f)
+
     print("Reading train data..")
-    train_dataset = ImgDataset(args.train_data)
+    train_dataset = ImgDataset(args.train_data, model_config['width'], model_config['height'],
+                               train_config['sigma'], train_config['mag'])
     print("Finish reading train data.")
 
     print("Reading val data..")
-    val_dataset = ImgDataset(args.val_data)
+    val_dataset = ImgDataset(args.val_data, model_config['width'], model_config['height'],
+                             train_config['sigma'], train_config['mag'])
     print("Finish reading train data.")
-
-    with open(args.train_config) as f:
-        train_config = json.load(f)
 
     train_dataloader = torch.utils.data.Dataloader(
         train_dataset, shuffle=True, batch_size=train_config['train_bs'], num_workers=8, pin_memory=True,
@@ -227,8 +242,6 @@ def main(args):
         collate_fn=collate
     )
 
-    with open(args.model_config) as f:
-        model_config = json.load(f)
     model = TrackNetV2(model_config['height'], model_config['width'], model_config['out'], model_config['dropout'])
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     model.to(device)

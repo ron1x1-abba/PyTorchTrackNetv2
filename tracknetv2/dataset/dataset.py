@@ -75,15 +75,10 @@ def generate_same(
         tmp = []
 
         for j in range(consecutive_frames):
-            if tgt[cur_label + j] == 0:
-                tmp.append(generate_heat_map(width, height, -1, -1, sigma, mag)[None, :, :])
-            else:
-                tmp.append(generate_heat_map(width, height,
-                                             int(x[cur_label + j] / w_ratio),
-                                             int(y[cur_label + j] / h_ratio),
-                                             sigma, mag)[None, :, :])
+            tmp.append((-1, -1, 0) if tgt[cur_label + j] == 0 else
+                       (int(x[cur_label + j] / w_ratio), int(y[cur_label + j] / h_ratio), 1))
 
-        targets.append(np.concatenate(tmp, axis=0))  # shape (cons_frames, H, W)
+        targets.append(tmp)
         frames = frames[1:]
         cur_label += 1
 
