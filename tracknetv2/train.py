@@ -231,7 +231,7 @@ def main(args):
     print("Reading val data..")
     val_dataset = ImgDataset(args.val_data, model_config['width'], model_config['height'],
                              train_config['sigma'], train_config['mag'])
-    print("Finish reading train data.")
+    print("Finish reading val data.")
 
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, shuffle=True, batch_size=train_config['train_bs'], num_workers=8, pin_memory=True,
