@@ -16,8 +16,6 @@ def parse_args():
     processed data.")
     parser.add_argument("--width", type=int, default=1280, help="Width of images which will be used in model.")
     parser.add_argument("--height", type=int, default=720, help="Height of images which will be used in model.")
-    parser.add_argument("--magnitude", type=float, default=2.0, help="Magnitude for heatmap.")
-    parser.add_argument("--sigma", type=float, default=2.5, help="Radius of ball on heatmap.")
     parser.add_argument("--consecutive_frames", type=int, default=3, help="Num of consecutive frames which will be\
      used by model.")
     parser.add_argument("--same_in_out", action='store_true', help="Whether to have for each consecutive frames same\
@@ -37,8 +35,6 @@ def create_dataset(args):
         imgs, tgts = generate_data(
             video_path=video,
             label_path=csv,
-            sigma=args.sigma,
-            mag=args.magnitude,
             width=args.width,
             height=args.height,
             consecutive_frames=args.consecutive_frames,

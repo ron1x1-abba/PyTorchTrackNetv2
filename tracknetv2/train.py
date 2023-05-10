@@ -190,10 +190,10 @@ def compute_metric(preds, targets, metric, out, tol):
                 x_p, y_p = find_pos((p * 255).astype(np.uint8))
                 x_t, y_t = find_pos((t * 255).astype(np.uint8))
                 dist = np.sqrt((x_p - x_t)**2 + (y_p - y_t)**2)
-                if dist >= tol:
-                    TP += 1
-                else:
+                if dist > tol:
                     FP += 1
+                else:
+                    TP += 1
 
     precision = TP / (TP + FP) if (TP + FP) > 0 else 0
     recall = TP / (TP + FN) if (TP + FN) else 0
@@ -249,7 +249,7 @@ def main(args):
     if train_config['compile']:
         model = torch.compile(model, mode='default')
 
-    criterion = CustomLoss()
+    criterion = CustomLoss(reduction='mean')
     if train_config['optimizer_config'] is not None:
         if train_config['optimizer_config']['name'] in OPTIMIZERS:
             optimizer = OPTIMIZERS[train_config['optimizer_config']['name']]

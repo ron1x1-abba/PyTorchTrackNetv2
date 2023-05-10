@@ -7,6 +7,16 @@ from typing import Union
 
 
 def generate_heat_map(width, height, x, y, sigma, mag):
+    """
+    Generate heatmap by a markup.
+    :param width: width of heatmap.
+    :param height: height of heatmap.
+    :param x: x-pixel of ball markup.
+    :param y: y-pixel of ball markup.
+    :param sigma: radius of ball in heatmap.
+    :param mag: heatmap magnitude. (i.e instead of ones on ball you will get mag values)
+    :return: (H, W)
+    """
     if x < 0 or y < 0:
         return np.zeros((height, width))
     cx, cy = np.meshgrid(np.linspace(1, width, width), np.linspace(1, height, height))
@@ -25,8 +35,6 @@ def generate_same(
     width,
     height,
     consecutive_frames,
-    sigma,
-    mag
 ):
     imgs = []
     targets = []
@@ -86,7 +94,6 @@ def generate_same(
 
 
 def generate_data(video_path: Union[str, Path], label_path: [str, Path],
-                  sigma: float, mag: float,
                   width: int, height: int, consecutive_frames: int = 3,
                   same_in_out: bool = True):
     """
@@ -94,8 +101,6 @@ def generate_data(video_path: Union[str, Path], label_path: [str, Path],
     Images returned in BGR format.
     :param video_path: path to video file (.mp4).
     :param label_path: path to .csv markup.
-    :param sigma: radius of ball in heatmap.
-    :param mag: heatmap magnitude. (i.e instead of ones on ball you will get mag values)
     :param width: width of images which will be used in your model.
     :param height: height of images which will be used in your model.
     :param consecutive_frames: num of consecutive frames to detect ball.
@@ -116,7 +121,7 @@ def generate_data(video_path: Union[str, Path], label_path: [str, Path],
 
     cap = cv2.VideoCapture(str(video_path))
 
-    imgs, targets = generate_same(cap, nums, x, y, tgt, width, height, consecutive_frames, sigma, mag)
+    imgs, targets = generate_same(cap, nums, x, y, tgt, width, height, consecutive_frames)
     if not same_in_out:
         targets = [x[[-1], :, :] for x in targets]
 

@@ -1,6 +1,6 @@
 {
-  "width": 1280,
-  "height": 720,
+  "width": 512,
+  "height": 288,
   "out": 3,
   "dropout": 0.0
 }

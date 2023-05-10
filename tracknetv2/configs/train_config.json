@@ -1,5 +1,5 @@
 {
-  "fp16": true,
+  "fp16": false,
   "epochs": 10,
   "train_bs": 8,
   "val_bs": 8,
@@ -9,7 +9,7 @@
   "tol": 5.0,
   "sigma": 2.5,
   "mag": 2,
-  "compile": true,
+  "compile": false,
   "optimizer_config": {
     "name": "adadelta",
     "lr": 1.0,
