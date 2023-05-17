@@ -212,7 +212,7 @@ def save_model(sd, epoch, step, path, metric, metric_name, model_v):
     os.makedirs(os.path.join(path, model_v), exist_ok=True)
     files = os.listdir(os.path.join(path, model_v))
     if len(files) == 1:
-        os.remove(files[0])
+        os.remove(os.path.join(path, model_v, files[0]))
     torch.save(sd, os.path.join(path, model_v, f"model_{epoch=}_{step=}_{metric_name}={metric}.pt"))
 
 

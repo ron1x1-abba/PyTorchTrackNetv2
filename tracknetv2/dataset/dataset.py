@@ -41,7 +41,7 @@ def generate_same(
 
     cur_frame = -1
     cur_label = 0
-    w_ratio, h_ratio = None, None
+    w_ratio, h_ratio = 1 / width, 1 / height
 
     frames = []
 
@@ -49,9 +49,7 @@ def generate_same(
         ret, frame = cap.read()
         if not ret:  # Reached the end of video
             break
-        if w_ratio is None:
-            w_ratio = frame.shape[1] / width
-            h_ratio = frame.shape[0] / height
+
         cur_frame += 1
 
         if cur_frame - len(frames) != nums[cur_label]:
