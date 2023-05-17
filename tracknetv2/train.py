@@ -86,38 +86,38 @@ def train(
     total_step = 0
 
     for epoch in tqdm(range(train_config['epochs'])):
-        pbar = tqdm(train_loader, total=len(train_loader), unit='batch', leave=False)
 
         model.train()
         cur_loss = 0
         losses = []
-        for batch_idx, batch in enumerate(pbar):
-            imgs, target = batch
-            imgs = imgs.to(device)
-            target = target.to(device)
+        with tqdm(train_loader, total=len(train_loader), unit='batch', leave=False) as pbar:
+            for batch_idx, batch in enumerate(pbar):
+                imgs, target = batch
+                imgs = imgs.to(device)
+                target = target.to(device)
 
-            if fp16:
-                with torch.cuda.amp.autocast(enabled=True, dtype=torch.float16):
+                if fp16:
+                    with torch.cuda.amp.autocast(enabled=True, dtype=torch.float16):
+                        preds = model(imgs)
+                        loss = criterion(target, preds)
+                        loss /= grad_accum
+                else:
                     preds = model(imgs)
                     loss = criterion(target, preds)
                     loss /= grad_accum
-            else:
-                preds = model(imgs)
-                loss = criterion(target, preds)
-                loss /= grad_accum
 
-            loss.backward()
-            cur_loss += loss.detach().cpu().item()
+                loss.backward()
+                cur_loss += loss.detach().cpu().item()
 
-            if (batch_idx + 1) % grad_accum == 0 or batch_idx == len(train_loader) - 1:
-                optimizer.step()
-                optimizer.zero_grad()
-                pbar.update(1)
-                pbar.set_postfix(loss=cur_loss)
-                writer.add_scalar("loss", cur_loss, total_step)
-                losses.append(cur_loss)
-                cur_loss = 0
-                total_step += 1
+                if (batch_idx + 1) % grad_accum == 0 or batch_idx == len(train_loader) - 1:
+                    optimizer.step()
+                    optimizer.zero_grad()
+                    pbar.update(1)
+                    pbar.set_postfix(loss=cur_loss)
+                    writer.add_scalar("loss", cur_loss, total_step)
+                    losses.append(cur_loss)
+                    cur_loss = 0
+                    total_step += 1
 
         writer.add_scalar("epoch_loss", np.mean(losses), total_step)
 
@@ -249,7 +249,7 @@ def main(args):
     if train_config['compile']:
         model = torch.compile(model, mode='default')
 
-    criterion = CustomLoss(reduction='mean')
+    criterion = CustomLoss(reduction='sum')
     if train_config['optimizer_config'] is not None:
         if train_config['optimizer_config']['name'] in OPTIMIZERS:
             optimizer = OPTIMIZERS[train_config['optimizer_config']['name']]
