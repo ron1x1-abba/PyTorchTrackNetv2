@@ -45,50 +45,53 @@ def generate_same(
 
     frames = []
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:  # Reached the end of video
-            break
-
-        cur_frame += 1
-
-        if cur_frame - len(frames) != nums[cur_label]:
-            if nums[cur_label] < cur_frame - len(frames):
-                cur_label += 1
-            frames = []
-            continue
-
-        if cur_label + (consecutive_frames - 1) >= len(nums):
-            break
-
-        if nums[cur_label] + (consecutive_frames - 1) != nums[cur_label + (consecutive_frames - 1)]:
-            cur_label += 1
-            frames = []
-            continue
-
-        frames.append(cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA))
-
-        if len(frames) == 1:
-            for _ in range(consecutive_frames - 1):
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                frames.append(cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA))
-                cur_frame += 1
-            if not ret:
+    with tqdm(total=int(cap.get(cv2.CAP_PROP_FRAME_COUNT)), leave=False) as pbar:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:  # Reached the end of video
                 break
 
-        imgs.append(frames)  # shape (3 * cons_frames, H, W)
+            cur_frame += 1
+            pbar.update(1)
 
-        tmp = []
+            if cur_frame - len(frames) != nums[cur_label]:
+                if nums[cur_label] < cur_frame - len(frames):
+                    cur_label += 1
+                frames = []
+                continue
 
-        for j in range(consecutive_frames):
-            tmp.append((-1, -1, 0) if tgt[cur_label + j] == 0 else
-                       (int(x[cur_label + j] / w_ratio), int(y[cur_label + j] / h_ratio), 1))
+            if cur_label + (consecutive_frames - 1) >= len(nums):
+                break
 
-        targets.append(tmp)
-        frames = frames[1:]
-        cur_label += 1
+            if nums[cur_label] + (consecutive_frames - 1) != nums[cur_label + (consecutive_frames - 1)]:
+                cur_label += 1
+                frames = []
+                continue
+
+            frames.append(cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA))
+
+            if len(frames) == 1:
+                for _ in range(consecutive_frames - 1):
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
+                    frames.append(cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA))
+                    cur_frame += 1
+                    pbar.update(1)
+                if not ret:
+                    break
+
+            imgs.append(frames)  # shape (3 * cons_frames, H, W)
+
+            tmp = []
+
+            for j in range(consecutive_frames):
+                tmp.append((-1, -1, 0) if tgt[cur_label + j] == 0 else
+                           (int(x[cur_label + j] / w_ratio), int(y[cur_label + j] / h_ratio), 1))
+
+            targets.append(tmp)
+            frames = frames[1:]
+            cur_label += 1
 
     return imgs, targets
 
