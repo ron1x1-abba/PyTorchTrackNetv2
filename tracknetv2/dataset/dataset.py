@@ -4,6 +4,7 @@ import cv2
 
 from pathlib import Path
 from typing import Union
+from tqdm.auto import tqdm
 
 
 def generate_heat_map(width, height, x, y, sigma, mag):
