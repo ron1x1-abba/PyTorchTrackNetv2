@@ -53,6 +53,8 @@ def generate_same(
         cur_frame += 1
 
         if cur_frame - len(frames) != nums[cur_label]:
+            if nums[cur_label] < cur_frame - len(frames):
+                cur_label += 1
             frames = []
             continue
 
